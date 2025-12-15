@@ -1,65 +1,49 @@
-AntColonyOptimization():
+ANT_COLONY_OPTIMIZATION()
 
-    // 1. Define the Problem
-    define objective_function(path)
-    define distance_matrix or graph_structure
+1. Initialize parameters:
+      α  ← pheromone importance
+      β  ← heuristic importance
+      ρ  ← evaporation rate
+      Q  ← pheromone constant
+      m  ← number of ants
+      MaxIter ← maximum iterations
 
-    // 2. Initialize Parameters
-    set num_ants
-    set max_iterations
-    set alpha            // influence of pheromone
-    set beta             // influence of visibility (heuristic)
-    set evaporation_rate
-    set pheromone_deposit_value
+2. Initialize pheromone on all edges:
+      for each edge (i, j):
+            τ[i][j] ← τ0
 
-    // 3. Initialize Pheromone Levels
-    for each edge in graph:
-        pheromone[edge] = initial_small_value
+3. for t ← 1 to MaxIter do
 
-    iteration = 0
+4.      for k ← 1 to m do
+5.            place ant k on a random city
+6.            tabu_list ← {starting city}
 
-    // 4. Main Optimization Loop
-    while iteration < max_iterations:
+7.            while not all cities visited do
+8.                  select next city j using probability:
+                       P(i → j) =
+                       (τ[i][j]^α * η[i][j]^β) /
+                       Σ (τ[i][l]^α * η[i][l]^β)
 
-        solutions = []     // store all ant paths
-        solution_costs = []
+9.                  move ant k to city j
+10.                 add j to tabu_list
+11.           end while
 
-        // 5. Construct Solutions Using Ants
-        for each ant in num_ants:
+12.           compute tour length Lk
+13.     end for
 
-            path = empty list
-            current_node = choose_random_start()
+14.     for each edge (i, j) do
+15.           τ[i][j] ← (1 − ρ) * τ[i][j]     // evaporation
+16.     end for
 
-            while not all nodes visited:
-                // compute probabilities of next node
-                for each neighbor:
-                    probability = 
-                        (pheromone[current_node, neighbor]^alpha) *
-                        (visibility[current_node, neighbor]^beta)
+17.     for k ← 1 to m do
+18.           for each edge (i, j) in ant k tour do
+19.                 τ[i][j] ← τ[i][j] + (Q / Lk)
+20.           end for
+21.     end for
 
-                next_node = select_based_on_probability()
-                add next_node to path
-                move ant to next_node
+22.     update best tour and best distance
+23. end for
 
-            solutions.append(path)
-            solution_costs.append( objective_function(path) )
+24. return best tour and minimum distance
 
-
-        // 6. Update Pheromones (Evaporation + Deposit)
-        for each edge in graph:
-            pheromone[edge] = (1 - evaporation_rate) * pheromone[edge]
-
-        for each ant's path in solutions:
-            cost = objective_function(path)
-            for each edge in this path:
-                pheromone[edge] += pheromone_deposit_value / cost
-
-
-        // 7. Track the Best Solution
-        update global_best_path with the best ant’s path so far
-
-        iteration = iteration + 1
-
-
-    // 8. Return Best Solution Found
-    return global_best_path
+END ANT_COLONY_OPTIMIZATION
